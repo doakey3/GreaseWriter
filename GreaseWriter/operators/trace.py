@@ -28,15 +28,15 @@ class GREASEPENCIL_OT_trace(bpy.types.Operator):
             frame = layer.frames[i]
             if i == 1:
                 vertex = frame.strokes[-1].points[0]
-                tracer.location[0] = vertex.co.x + obj.location[0]
-                tracer.location[1] = vertex.co.y + obj.location[1]
+                tracer.location[0] = vertex.co.x
+                tracer.location[1] = vertex.co.y
                 tracer.keyframe_insert(data_path="location", index=0, frame=frame.frame_number - 1)
                 tracer.keyframe_insert(data_path="location", index=1, frame=frame.frame_number - 1)
 
             if (len(frame.strokes) > 0):
                 vertex = frame.strokes[-1].points[-1]
-                tracer.location[0] = vertex.co.x + obj.location[0]
-                tracer.location[1] = vertex.co.y + obj.location[1]
+                tracer.location[0] = vertex.co.x
+                tracer.location[1] = vertex.co.y
                 tracer.keyframe_insert(data_path="location", index=0, frame=frame.frame_number)
                 tracer.keyframe_insert(data_path="location", index=1, frame=frame.frame_number)
 

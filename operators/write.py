@@ -160,7 +160,7 @@ class GREASEPENCIL_OT_write(bpy.types.Operator):
         obj = bpy.context.view_layer.objects.active
         gpencil = obj.data
 
-        text = bpy.data.texts[gpencil.source_text].as_string()
+        text = bpy.data.texts[gpencil.source_text].as_string().strip()
 
         font = gpencil.font
         letter_folder = os.path.join(os.path.dirname(__file__), 'fonts', font)

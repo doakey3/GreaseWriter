@@ -69,7 +69,7 @@ def draw_glyph(glyph_strokes):
                 stroke.material_index = mat_index
 
                 for vert in glyph_strokes[y]:
-                    stroke.points.add(gpencil, 1)
+                    stroke.points.add(1)
                     stroke.points[-1].co.x = vert[0]
                     stroke.points[-1].co.y = vert[1]
 
@@ -79,7 +79,7 @@ def draw_glyph(glyph_strokes):
             stroke.material_index = mat_index
 
             for vert in framed_strokes[x]:
-                stroke.points.add(gpencil, 1)
+                stroke.points.add(1)
                 stroke.points[-1].co.x = vert[0]
                 stroke.points[-1].co.y = vert[1]
 
@@ -93,7 +93,7 @@ def draw_glyph(glyph_strokes):
         stroke.material_index = mat_index
 
         for vert in stroke_verts:
-            stroke.points.add(gpencil, 1)
+            stroke.points.add(1)
             stroke.points[-1].co.x = vert[0]
             stroke.points[-1].co.y = vert[1]
 

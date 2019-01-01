@@ -5,7 +5,7 @@ from .utils import draw_glyph
 from .utils import process_stroke_verts_linearly
 
 def ellipse(t, a, b):
-    return [a * math.cos(t), b * math.sin(t)]
+    return [a * math.cos(t), b * math.sin(t), 0]
 
 
 def ellipse_points(origin_x, origin_y, a, b, count=100):
@@ -61,22 +61,23 @@ class GREASEPENCIL_OT_decorate(bpy.types.Operator):
             return False
 
     def execute(self, context):
+        scene = context.scene
+
         obj = bpy.context.view_layer.objects.active
         gpencil = obj.data
 
         obj_name = obj.name
-        speed = gpencil.draw_speed
-        thickness = gpencil.write_thickness
-        line_height = gpencil.line_height
+        speed = scene.gw_speed
+        thickness = scene.gw_thickness
+        line_height = scene.gw_line_height
 
-        color = gpencil.write_color
+        color = scene.gw_color
 
         left, right, bottom, top = get_glyph_size(gpencil)
         width = right - left
         height = top - bottom
 
         style = gpencil.decorator_style
-        thickness = gpencil.write_thickness
 
         glyph_strokes = []
 
@@ -86,37 +87,37 @@ class GREASEPENCIL_OT_decorate(bpy.types.Operator):
         origin_y = (height / 2) + bottom
 
         if style == "underline":
-            v1 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y]
-            v2 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y]
+            v1 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
+            v2 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
             glyph_strokes.append([v1, v2])
 
         elif style == "over-underline":
-            v1 = [left - (width * padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y]
-            v2 = [right * (1 + padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y]
+            v1 = [left - (width * padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
+            v2 = [right * (1 + padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
             glyph_strokes.append([v1, v2])
 
-            v1 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y]
-            v2 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y]
+            v1 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
+            v2 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
             glyph_strokes.append([v1, v2])
 
         elif style == "x-out":
-            v1 = [left - (width * padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y]
-            v2 = [right * (1 + padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y]
-            v3 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y]
-            v4 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y]
+            v1 = [left - (width * padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
+            v2 = [right * (1 + padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
+            v3 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
+            v4 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
             glyph_strokes.append([v1, v3])
             glyph_strokes.append([v2, v4])
 
         elif style == "strike-through":
-            v1 = [left - (width * padding_fac) - origin_x, bottom + (height / 2) - origin_y]
-            v2 = [right * (1 + padding_fac) - origin_x, bottom + (height / 2) - origin_y]
-            glyph_strokes.append([v1, v2])
+            v1 = [left - (width * padding_fac) - origin_x, bottom + (height / 2) - origin_y, 0]
+            v2 = [right * (1 + padding_fac) - origin_x, bottom + (height / 2) - origin_y, 0]
+            glyph_strokes.append([v1, v2, 0])
 
         elif style == "box":
-            v1 = [left - (width * padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y]
-            v2 = [right * (1 + padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y]
-            v3 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y]
-            v4 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y]
+            v1 = [left - (width * padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
+            v2 = [right * (1 + padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
+            v3 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
+            v4 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
             glyph_strokes.append([v1, v2, v3, v4, v1])
 
         elif style == "ellipse":
@@ -154,27 +155,33 @@ class GREASEPENCIL_OT_decorate(bpy.types.Operator):
 
 
         last_point = gpencil.layers[0].frames[-1].strokes[-1].points[-1]
-        last_vert = [last_point.co.x, last_point.co.y]
+        last_vert = [last_point.co.x, last_point.co.y, 0]
         new_vert = glyph_strokes[0][0]
         count = len(process_stroke_verts_linearly([last_vert, new_vert], speed)) - 1
 
         bpy.context.scene.frame_current = gpencil.layers[0].frames[-1].frame_number + count
 
         new_gpencil = bpy.data.grease_pencil.new('gpencil')
-        new_gpencil.draw_speed = speed
-        new_gpencil.write_thickness = thickness
-        new_gpencil.write_color = gpencil.write_color
+        color = scene.gw_color
+        new_mat = bpy.data.materials.new('decorator')
+        bpy.data.materials.create_gpencil_data(new_mat)
+        new_mat.grease_pencil.color[0] = color[0]
+        new_mat.grease_pencil.color[1] = color[1]
+        new_mat.grease_pencil.color[2] = color[2]
 
         new_obj = bpy.data.objects.new(obj_name + '_' + style, new_gpencil)
         bpy.context.scene.collection.objects.link(new_obj)
+        bpy.context.view_layer.objects.active = new_obj
+        new_obj.select_set(True)
+
+        new_obj.data.materials.append(new_mat)
+
         new_obj.location[0] = origin_x
         new_obj.location[1] = origin_y
 
         new_obj.empty_display_size = 0.2
         new_obj.parent = obj
 
-        bpy.context.view_layer.objects.active = new_obj
-
-        draw_glyph(glyph_strokes)
+        draw_glyph(new_obj, glyph_strokes)
 
         return {"FINISHED"}

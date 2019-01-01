@@ -107,6 +107,7 @@ def get_char_name(char):
         "♀": "female",
         "♂": "male",
         '"': "quotedouble",
+        "°": "degree",
     }
     try:
         return character_dict[char]
@@ -120,26 +121,35 @@ def get_glyph_width(vert_collection):
         verts.extend(group)
     return max(verts, key=lambda v: v[0])[0]
 
+def get_connection_points(vert_collection, y_range):
+    verts = []
+    for group in vert_collection:
+        for vert in group:
+            if vert[1] >= y_range[0] and vert[1] <= y_range[1]:
+                verts.append(vert)
+    min_x = min(verts, key=lambda v: v[0])[0]
+    max_x = max(verts, key=lambda v: v[0])[0]
+    return min_x, max_x
 
-def get_m_size():
-    gpencil = bpy.context.active_object.data
-    font = gpencil.font
+def get_glyph_verts(char):
+    scene = bpy.context.scene
+    font = scene.gw_font
     letter_folder = os.path.join(os.path.dirname(__file__), 'fonts', font)
-    glyph_name = get_char_name('M') + '.glyph'
-    path = os.path.join(letter_folder, glyph_name)
 
-    with open(os.path.join(letter_folder, glyph_name)) as f:
-        char_text = f.read().strip()
+    glyph_name = get_char_name(char) + ".glyph"
+    try:
+        with open(os.path.join(letter_folder, glyph_name)) as f:
+            char_text = f.read().strip()
+    except FileNotFoundError:
+        with open(os.path.join(letter_folder, 'box.glyph')) as f:
+            char_text = f.read().strip()
     lines = char_text.split('\n')
 
-    verts = []
+    glyph_verts = []
     for line in lines:
-        curve_verts = eval(line)
-        for vert in curve_verts:
-            verts.append(vert)
-    max_x = max(verts, key=lambda v: v[0])[0]
-    max_y = max(verts, key=lambda v: v[1])[1]
-    return max_x, max_y
+        verts = eval(line)
+        glyph_verts.append(verts)
+    return glyph_verts
 
 
 class GREASEPENCIL_OT_write(bpy.types.Operator):
@@ -150,57 +160,115 @@ class GREASEPENCIL_OT_write(bpy.types.Operator):
 
     @classmethod
     def poll(self, context):
-        gpencil = bpy.context.view_layer.objects.active.data
-        if gpencil.source_text != '':
+        scene = context.scene
+        if scene.gw_source_text != '' or scene.gw_source_text_file != '':
             return True
         else:
             return False
 
     def execute(self, context):
-        obj = bpy.context.view_layer.objects.active
-        gpencil = obj.data
+        scene = context.scene
 
-        text = bpy.data.texts[gpencil.source_text].as_string().strip()
+        # Adjust settings for each font so they look good by default
+        font_props = {
+            "consolas": {
+                "word space": 0.425,
+                "kerning": 0.425,
+                "line height": 1.1,
+                "monospace": True
+            },
+            "hershey_script_simplex": {
+                "word space": 0.5,
+                "kerning": 0.26,
+                "line height": 2.2,
+                # The cursive letters should connect somewhere within this y range
+                "y_range": [0.63, 1.4],
+            },
+            "hershey_roman_simplex": {
+                "word space": 0.5,
+                "kerning": 0.185,
+                "line height": 1.25,
+            },
+        }
 
-        font = gpencil.font
-        letter_folder = os.path.join(os.path.dirname(__file__), 'fonts', font)
+        gpencil = bpy.data.grease_pencil.new('greasewriter')
 
-        m_width, m_height = get_m_size()
-        speed = gpencil.draw_speed
-        kerning = gpencil.kerning
-        line_height = gpencil.line_height
-        thickness = gpencil.write_thickness
-        color = gpencil.write_color
+        color = scene.gw_color
+        new_mat = bpy.data.materials.new('writings')
+        bpy.data.materials.create_gpencil_data(new_mat)
+        new_mat.grease_pencil.color[0] = color[0]
+        new_mat.grease_pencil.color[1] = color[1]
+        new_mat.grease_pencil.color[2] = color[2]
+
+        obj = bpy.data.objects.new('greasewritten', gpencil)
+        obj.data.materials.append(new_mat)
+        bpy.context.scene.collection.objects.link(obj)
+
+        if scene.gw_source_text != '':
+            text = scene.gw_source_text.rstrip()
+        elif scene.gw_source_text_file != '':
+            text = bpy.data.texts[scene.gw_source_text_file].as_string().rstrip()
+
+        font = scene.gw_font
+
+        scale = scene.gw_scale
+
+        font = scene.gw_font
+        kerning = font_props[font]['kerning'] * scene.gw_kerning
+        word_space = font_props[font]['word space'] * scene.gw_word_space
+        line_height = font_props[font]['line height'] * scene.gw_line_height
 
         current_x = 0
         current_y = 0
 
         glyph_strokes = []
+        prev_char = None
 
-        for char in text:
+        c = 0
+        while c < len(text):
+            char = text[c]
             if char == " ":
-                current_x += m_width
+                current_x += word_space
             elif char == "\n":
-                current_y -= m_height * line_height
+                current_y -= line_height
                 current_x = 0
             else:
-                glyph_name = get_char_name(char) + ".glyph"
-                with open(os.path.join(letter_folder, glyph_name)) as f:
-                    char_text = f.read().strip()
-                lines = char_text.split('\n')
+                glyph_verts = get_glyph_verts(char)
+                unchanged_verts = copy.deepcopy(glyph_verts)
+                glyph_width = get_glyph_width(glyph_verts)
+                for group in glyph_verts:
+                    for vert in group:
+                        vert[0] += current_x
+                        if 'monospace' in font_props[font]:
+                            vert[0] += (kerning / 2) - (glyph_width / 2)
+                        vert[1] += current_y - line_height
 
-                glyph_verts = []
-                for line in lines:
-                    verts = eval(line)
-                    glyph_verts.append(copy.deepcopy(verts))
+                    glyph_strokes.append(group)
 
-                    for vert in verts:
-                        vert[0] += current_x + (thickness / 1000)
-                        vert[1] += current_y - (m_height * line_height)
-                    glyph_strokes.append(verts)
+                if char.isalpha() and 'y_range' in font_props[font] and c < len(text) - 1 and text[c + 1].isalpha():
+                    this_connect_points = get_connection_points(unchanged_verts, font_props[font]['y_range'])
+                    next_glyph_verts = get_glyph_verts(text[c + 1])
+                    next_connect_points = get_connection_points(next_glyph_verts, font_props[font]['y_range'])
 
-                current_x += get_glyph_width(glyph_verts) + (m_width * kerning)
+                    current_x += this_connect_points[1] - next_connect_points[0]
 
-        draw_glyph(glyph_strokes)
+                elif 'monospace' in font_props[font]:
+                    current_x += kerning
+
+                else:
+                    current_x += glyph_width + kerning
+            c += 1
+
+        draw_glyph(obj, glyph_strokes)
+
+        obj.scale[0] = scale
+        obj.scale[1] = scale
+        obj.scale[2] = scale
+
+        obj.empty_display_size = 0.5
+
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
 
         return {"FINISHED"}

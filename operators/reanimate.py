@@ -21,13 +21,15 @@ class GREASEPENCIL_OT_reanimate(bpy.types.Operator):
         obj = bpy.context.view_layer.objects.active
         gpencil = obj.data
 
+        thicknesses = []
         layer = gpencil.layers[0]
         frame = layer.frames[-1]
         glyph_strokes = []
         for stroke in frame.strokes:
             verts = []
+            thicknesses.append(stroke.line_width)
             for point in stroke.points:
-                verts.append([point.co.x, point.co.y])
+                verts.append([point.co.x, point.co.y, point.co.z])
             glyph_strokes.append(verts)
 
         layer.clear()
@@ -36,6 +38,6 @@ class GREASEPENCIL_OT_reanimate(bpy.types.Operator):
         except IndexError:
             pass
 
-        draw_glyph(glyph_strokes)
+        draw_glyph(obj, glyph_strokes, thicknesses=thicknesses)
 
         return {"FINISHED"}

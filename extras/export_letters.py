@@ -141,4 +141,3 @@ if __name__ == "__main__":
         export_glyph(objs[i], path)
         update_progress("Making Glyphs", i / len(objs))
     update_progress("Making Glyphs", 1)
-

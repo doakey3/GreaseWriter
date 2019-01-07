@@ -19,6 +19,7 @@ def get_char_name(char):
         "-": "minus",
         ".": "period",
         "/": "slash",
+        "№": "numero-sign",
         "0": "0",
         "1": "1",
         "2": "2",
@@ -209,7 +210,6 @@ def get_glyph_verts(char):
         with open(os.path.join(letter_folder, glyph_name)) as f:
             char_text = f.read().strip()
     except FileNotFoundError:
-        print(os.path.join(letter_folder, glyph_name))
         with open(os.path.join(letter_folder, 'box.glyph')) as f:
             char_text = f.read().strip()
     lines = char_text.split('\n')

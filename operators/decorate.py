@@ -87,37 +87,37 @@ class GREASEPENCIL_OT_decorate(bpy.types.Operator):
         origin_y = (height / 2) + bottom
 
         if style == "underline":
-            v1 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
-            v2 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
+            v1 = [left - (line_height * padding_fac * 2) - origin_x, bottom - (line_height * padding_fac * 2) - origin_y, 0]
+            v2 = [right + (line_height * padding_fac * 2) - origin_x, bottom - (line_height * padding_fac * 2) - origin_y, 0]
             glyph_strokes.append([v1, v2])
 
         elif style == "over-underline":
-            v1 = [left - (width * padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
-            v2 = [right * (1 + padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
+            v1 = [left - (line_height * padding_fac * 2) - origin_x, top + (line_height * padding_fac * 2) - origin_y, 0]
+            v2 = [right + (line_height * padding_fac * 2) - origin_x, top + (line_height * padding_fac * 2) - origin_y, 0]
             glyph_strokes.append([v1, v2])
 
-            v1 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
-            v2 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
+            v1 = [left - (line_height * padding_fac * 2) - origin_x, bottom - (line_height * padding_fac * 2) - origin_y, 0]
+            v2 = [right + (line_height * padding_fac * 2) - origin_x, bottom - (line_height * padding_fac * 2) - origin_y, 0]
             glyph_strokes.append([v1, v2])
 
         elif style == "x-out":
-            v1 = [left - (width * padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
-            v2 = [right * (1 + padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
-            v3 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
-            v4 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
+            v1 = [left - (line_height * padding_fac * 2) - origin_x, top + (line_height * padding_fac * 2) - origin_y, 0]
+            v2 = [right + (line_height * padding_fac * 2) - origin_x, top + (line_height * padding_fac * 2) - origin_y, 0]
+            v3 = [right + (line_height * padding_fac * 2) - origin_x, bottom - (line_height * padding_fac * 2) - origin_y, 0]
+            v4 = [left - (line_height * padding_fac * 2) - origin_x, bottom - (line_height * padding_fac * 2) - origin_y, 0]
             glyph_strokes.append([v1, v3])
             glyph_strokes.append([v2, v4])
 
         elif style == "strike-through":
-            v1 = [left - (width * padding_fac) - origin_x, bottom + (height / 2) - origin_y, 0]
-            v2 = [right * (1 + padding_fac) - origin_x, bottom + (height / 2) - origin_y, 0]
-            glyph_strokes.append([v1, v2, 0])
+            v1 = [left - (line_height * padding_fac * 2) - origin_x, bottom + (height / 2) - origin_y, 0]
+            v2 = [right + (line_height * padding_fac * 2) - origin_x, bottom + (height / 2) - origin_y, 0]
+            glyph_strokes.append([v1, v2])
 
         elif style == "box":
-            v1 = [left - (width * padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
-            v2 = [right * (1 + padding_fac) - origin_x, top + (line_height * padding_fac) - origin_y, 0]
-            v3 = [right * (1 + padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
-            v4 = [left - (width * padding_fac) - origin_x, bottom - (line_height * padding_fac) - origin_y, 0]
+            v1 = [left - (line_height * padding_fac * 2) - origin_x, top + (line_height * padding_fac * 2) - origin_y, 0]
+            v2 = [right + (line_height * padding_fac * 2) - origin_x, top + (line_height * padding_fac * 2) - origin_y, 0]
+            v3 = [right + (line_height * padding_fac * 2) - origin_x, bottom - (line_height * padding_fac * 2) - origin_y, 0]
+            v4 = [left - (line_height * padding_fac * 2) - origin_x, bottom - (line_height * padding_fac * 2) - origin_y, 0]
             glyph_strokes.append([v1, v2, v3, v4, v1])
 
         elif style == "ellipse":

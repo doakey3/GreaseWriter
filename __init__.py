@@ -138,7 +138,8 @@ def init_props():
         ("consolas", "Consolas", "A monospace font based on Consolas by doakey3"),
         ("hershey_script_simplex", "Hershey's Script Simplex", "A cursive font made by by Dr. Allen Vincent Hershey"),
         ("hershey_roman_simplex", "Hershey's Roman Simplex", "A sans font made by by Dr. Allen Vincent Hershey"),
-        ("shohrukh_russian", "Shohrukh's Russian", "A font made by Shohrukh for Russian characters")
+        ("shohrukh_russian", "Shohrukh's Russian", "A font made by Shohrukh for Russian characters"),
+        ("shohrukh_tajik", "Shohrukh's Tajik", "A font made by Shohrukh for Tajik characters")
     ]
 
     bpy.types.Scene.gw_font = bpy.props.EnumProperty(
@@ -197,7 +198,6 @@ def init_props():
         default=2,
         min=1
     )
-
 
 classes = [
     GREASEPENCIL_PT_greasewriter,

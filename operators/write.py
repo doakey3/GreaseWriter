@@ -177,6 +177,21 @@ def get_char_name(char):
         "Ю": "ю-uppercase",
         "я": "я-lowercase",
         "Я": "я-uppercase",
+
+        # Tajik Characters
+        "ғ": "ғ-lowercase",
+        "Ғ": "ғ-uppercase",
+        "ӣ": "ӣ-lowercase",
+        "Ӣ": "ӣ-uppercase",
+        "қ": "қ-lowercase",
+        "Қ": "қ-uppercase",
+        "ӯ": "ӯ-lowercase",
+        "Ӯ": "ӯ-uppercase",
+        "ҳ": "ҳ-lowercase",
+        "Ҳ": "ҳ-uppercase",
+        "ҷ": "ҷ-lowercase",
+        "Ҷ": "ҷ-uppercase",
+
     }
     try:
         return character_dict[char]
@@ -259,8 +274,13 @@ class GREASEPENCIL_OT_write(bpy.types.Operator):
                 "line height": 1.25,
             },
             "shohrukh_russian": {
-                "word space": 0.425,
-                "kerning": 0.25,
+                "word space": 0.4,
+                "kerning": 0.2,
+                "line height": 1.1,
+            },
+            "shohrukh_tajik": {
+                "word space": 0.4,
+                "kerning": 0.2,
                 "line height": 1.1,
             },
         }

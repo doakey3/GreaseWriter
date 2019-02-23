@@ -6,7 +6,7 @@ bl_info = {
     "name": "Grease Writer",
     "description": "Automatic hand-drawn text animation",
     "author": "doakey3",
-    "version": (0, 0, 3),
+    "version": (0, 0, 4),
     "blender": (2, 80, 0),
     "wiki_url": "https://github.com/doakey3/GreaseDraw",
     "tracker_url": "https://github.com/doakey3/GreaseDraw/issues",

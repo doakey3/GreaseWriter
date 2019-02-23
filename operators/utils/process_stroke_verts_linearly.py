@@ -39,7 +39,7 @@ def process_stroke_verts_linearly(original_stroke_verts, speed, remaining=0, sti
         if distance > remaining:
             new_x = ((remaining / distance) * x) + v1[0]
             new_y = ((remaining / distance) * y) + v1[1]
-            new_z = ((remaining / distance) * z) + v2[2]
+            new_z = ((remaining / distance) * z) + v1[2]
 
             framed_strokes[-1].append([new_x, new_y, new_z])
             if stipple == False:

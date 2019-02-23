@@ -259,7 +259,7 @@ class GREASEPENCIL_OT_write(bpy.types.Operator):
                 "word space": 0.425,
                 "kerning": 0.425,
                 "line height": 1.1,
-                "monospace": True
+                #"monospace": True
             },
             "hershey_script_simplex": {
                 "word space": 0.5,

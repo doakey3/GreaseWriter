@@ -285,7 +285,7 @@ class GREASEPENCIL_OT_write(bpy.types.Operator):
             },
         }
 
-        gpencil = bpy.data.grease_pencil.new('greasewriter')
+        gpencil = bpy.data.grease_pencils.new('greasewriter')
 
         color = scene.gw_color
         new_mat = bpy.data.materials.new('writings')
